@@ -38,6 +38,9 @@ class BookingController extends Controller
 
         $validated = $request->validate([
             'move_in_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'agreed_to_terms' => ['accepted'],
+        ], [
+            'agreed_to_terms.accepted' => 'You must read and agree to the Rental Agreement before booking.',
         ]);
 
         try {

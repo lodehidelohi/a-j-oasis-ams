@@ -3,7 +3,13 @@
 @section('title', 'Lease Details')
 
 @section('content')
-<x-page-header :title="'Lease #' . $lease->id" />
+<x-page-header :title="'Lease #' . $lease->id">
+    <x-slot:actions>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#leaseAgreementModal">
+            <i class="bi bi-file-text me-1"></i>View Lease Agreement
+        </button>
+    </x-slot:actions>
+</x-page-header>
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-body p-4">
@@ -183,4 +189,28 @@
         </div>
     </div>
 @endif
+
+<div class="modal fade" id="leaseAgreementModal" tabindex="-1" aria-labelledby="leaseAgreementModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="leaseAgreementModalLabel"><i class="bi bi-file-text me-1"></i>Rental Agreement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @include('partials.lease-agreement', [
+                    'room' => $lease->room,
+                    'tenantName' => $lease->tenant->name,
+                    'startLabel' => $lease->start_date->format('M d, Y'),
+                ])
+                @if ($lease->booking?->agreement_accepted_at)
+                    <p class="text-muted small border-top pt-2 mt-3 mb-0">Agreed to by {{ $lease->tenant->name }} on {{ $lease->booking->agreement_accepted_at->format('M d, Y \a\t g:i A') }}.</p>
+                @endif
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

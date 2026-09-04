@@ -46,6 +46,7 @@ class BookingService
                 'deposit_amount' => $monthly,
                 'security_amount' => $monthly,
                 'total_amount' => $monthly * 3,
+                'agreement_accepted_at' => now(),
             ]);
 
             $locked->update(['status' => 'reserved']);

@@ -23,6 +23,7 @@ class Booking extends Model
         'deposit_amount',
         'security_amount',
         'total_amount',
+        'agreement_accepted_at',
     ];
 
     protected function casts(): array
@@ -35,6 +36,7 @@ class Booking extends Model
             'deposit_amount' => 'decimal:2',
             'security_amount' => 'decimal:2',
             'total_amount' => 'decimal:2',
+            'agreement_accepted_at' => 'datetime',
         ];
     }
 
