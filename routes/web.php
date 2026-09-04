@@ -88,6 +88,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/leases/{lease}/generate-rent', [PaymentController::class, 'generateRent'])->name('leases.generate-rent');
 
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::post('/payments/{payment}/record-manual', [PaymentController::class, 'recordManual'])->name('payments.record-manual');
 
     Route::get('/utility-bills', [UtilityBillController::class, 'index'])->name('utility-bills.index');
     Route::get('/utility-bills/create', [UtilityBillController::class, 'createAny'])->name('utility-bills.create-any');

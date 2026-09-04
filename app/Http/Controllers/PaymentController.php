@@ -60,6 +60,21 @@ class PaymentController extends Controller
     }
 
     /**
+     * Admin records a payment collected outside the system (walk-in cash,
+     * bank transfer) — applies the same completion side effects (lease
+     * activation, receipts, notifications) as a real Xendit payment, just
+     * without a gateway reference.
+     */
+    public function recordManual(Payment $payment): RedirectResponse
+    {
+        abort_unless($payment->status === 'pending', 422, 'This payment is not payable.');
+
+        $this->completion->complete($payment);
+
+        return back()->with('status', 'Payment recorded as paid.');
+    }
+
+    /**
      * Tenant initiates payment for a pending payment record via Xendit.
      */
     public function pay(Payment $payment): RedirectResponse

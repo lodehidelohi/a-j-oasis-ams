@@ -35,7 +35,9 @@
             @csrf
             <div class="mb-3">
                 <label class="form-label">Move-in Date (optional now)</label>
-                <input type="date" name="move_in_date" class="form-control" min="{{ now()->toDateString() }}">
+                <input type="date" name="move_in_date" class="form-control @error('move_in_date') is-invalid @enderror" min="{{ now()->toDateString() }}" max="{{ now()->addDays(7)->toDateString() }}" value="{{ old('move_in_date') }}">
+                @error('move_in_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                <div class="form-text">Must be within 7 days of booking. You can also select it later, up until the same 7-day deadline.</div>
             </div>
             <div class="form-check mb-3">
                 <input type="checkbox" name="agreed_to_terms" value="1" class="form-check-input" id="agreeCheckbox" disabled required>

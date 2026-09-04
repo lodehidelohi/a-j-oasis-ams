@@ -13,6 +13,13 @@
             </thead>
             <tbody>
                 @forelse ($payments as $payment)
+                    @php
+                        $displayStatus = match (true) {
+                            $payment->status === 'pending' && $payment->isOverdue() => 'overdue',
+                            $payment->status === 'pending' && $payment->isWithinGracePeriod() => 'grace_period',
+                            default => $payment->status,
+                        };
+                    @endphp
                     <tr>
                         <td>{{ ucfirst(str_replace('_', ' ', $payment->type)) }}</td>
                         <td class="text-muted">
@@ -20,7 +27,7 @@
                         </td>
                         <td>₱{{ number_format($payment->amount, 2) }}</td>
                         <td>{{ $payment->due_date->format('M d, Y') }}</td>
-                        <td><x-status-badge :status="$payment->status" /></td>
+                        <td><x-status-badge :status="$displayStatus" /></td>
                         <td class="text-end">
                             @if (! auth()->user()->isAdmin() && $payment->status === 'pending')
                                 <form method="POST" action="{{ route('payments.pay', $payment) }}" class="d-inline">
@@ -33,6 +40,12 @@
                                         <button class="btn btn-sm btn-outline-secondary" title="Already paid on Xendit's checkout page? Check here for local dev, since the webhook can't reach 127.0.0.1."><i class="bi bi-arrow-repeat me-1"></i>Check Status</button>
                                     </form>
                                 @endif
+                            @endif
+                            @if (auth()->user()->isAdmin() && $payment->status === 'pending')
+                                <form method="POST" action="{{ route('admin.payments.record-manual', $payment) }}" class="d-inline" onsubmit="return confirm('Record this payment as paid via cash/walk-in? This cannot be undone.')">
+                                    @csrf
+                                    <button class="btn btn-sm btn-success"><i class="bi bi-cash-coin me-1"></i>Record Payment</button>
+                                </form>
                             @endif
                             @if ($payment->status === 'paid')
                                 <a href="{{ route('payments.receipt', $payment) }}" target="_blank" class="btn btn-sm btn-outline-success"><i class="bi bi-receipt me-1"></i>Receipt</a>

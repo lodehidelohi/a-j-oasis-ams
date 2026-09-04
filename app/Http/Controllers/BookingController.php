@@ -42,10 +42,11 @@ class BookingController extends Controller
         abort_unless($room->isVacant(), 422, 'This room is not available.');
 
         $validated = $request->validate([
-            'move_in_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'move_in_date' => ['nullable', 'date', 'after_or_equal:today', 'before_or_equal:'.now()->addDays(7)->toDateString()],
             'agreed_to_terms' => ['accepted'],
         ], [
             'agreed_to_terms.accepted' => 'You must read and agree to the Rental Agreement before booking.',
+            'move_in_date.before_or_equal' => 'Move-in date must be within 7 days of booking.',
         ]);
 
         try {
