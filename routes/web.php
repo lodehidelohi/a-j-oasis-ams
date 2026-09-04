@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/payments/fake-complete/{reference}', [PaymentController::class, 'fakeComplete'])->name('payments.fake-complete');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])->name('notifications.unread');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
     Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
 });

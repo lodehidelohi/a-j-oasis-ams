@@ -25,6 +25,15 @@ class NotificationController extends Controller
         return back();
     }
 
+    public function markUnread(Notification $notification): RedirectResponse
+    {
+        abort_unless($notification->user_id === auth()->id(), 403);
+
+        $notification->update(['read_at' => null]);
+
+        return back();
+    }
+
     public function markAllRead(Request $request): RedirectResponse
     {
         $request->user()->notifications()->whereNull('read_at')->update(['read_at' => now()]);

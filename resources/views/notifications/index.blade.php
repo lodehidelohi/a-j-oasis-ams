@@ -31,12 +31,17 @@
                 @if ($notification->linkFor(auth()->user()))
                     <a href="{{ route('notifications.open', $notification) }}" class="btn btn-sm btn-primary">View</a>
                 @endif
-                @unless ($notification->isRead())
+                @if ($notification->isRead())
+                    <form method="POST" action="{{ route('notifications.unread', $notification) }}">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-secondary">Mark as unread</button>
+                    </form>
+                @else
                     <form method="POST" action="{{ route('notifications.read', $notification) }}">
                         @csrf
                         <button class="btn btn-sm btn-outline-secondary">Mark as read</button>
                     </form>
-                @endunless
+                @endif
             </div>
         </div>
     @empty
