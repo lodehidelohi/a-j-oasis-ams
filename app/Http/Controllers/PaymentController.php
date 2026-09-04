@@ -143,6 +143,18 @@ class PaymentController extends Controller
         return redirect()->route('payments.success');
     }
 
+    public function receipt(Payment $payment): View
+    {
+        $tenant = $payment->lease?->tenant ?? $payment->booking?->tenant;
+
+        abort_unless(auth()->user()->isAdmin() || ($tenant && $tenant->id === auth()->id()), 403);
+        abort_unless($payment->status === 'paid', 404);
+
+        $payment->load(['lease.room.property', 'lease.tenant', 'booking.room.property', 'booking.tenant']);
+
+        return view('payments.receipt', compact('payment'));
+    }
+
     public function success(): View
     {
         return view('payments.success');

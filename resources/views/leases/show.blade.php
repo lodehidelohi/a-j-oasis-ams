@@ -69,6 +69,9 @@
                                         </form>
                                     @endif
                                 @endif
+                                @if ($payment->status === 'paid')
+                                    <a href="{{ route('payments.receipt', $payment) }}" target="_blank" class="btn btn-sm btn-outline-success"><i class="bi bi-receipt me-1"></i>Receipt</a>
+                                @endif
                             </td>
                         </tr>
                     @empty
