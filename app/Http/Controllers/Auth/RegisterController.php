@@ -16,7 +16,7 @@ class RegisterController extends Controller
 {
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.form', ['activeTab' => 'signup']);
     }
 
     public function store(Request $request): RedirectResponse
