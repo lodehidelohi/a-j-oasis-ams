@@ -17,7 +17,7 @@ class AnnouncementController extends Controller
 {
     public function __construct(protected NotificationService $notifications) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $announcements = Announcement::with(['author', 'property', 'tenant'])
             ->latest()
@@ -25,6 +25,8 @@ class AnnouncementController extends Controller
 
         $properties = Property::orderBy('name')->get();
         $tenants = User::where('role', 'tenant')->orderBy('name')->get();
+
+        $this->notifications->markTypesRead($request->user(), ['announcement']);
 
         return view('admin.announcements.index', compact('announcements', 'properties', 'tenants'));
     }

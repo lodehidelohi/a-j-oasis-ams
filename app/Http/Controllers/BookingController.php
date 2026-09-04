@@ -21,7 +21,7 @@ class BookingController extends Controller
             ? Booking::with(['tenant', 'room.property'])->latest()->paginate(20)
             : Booking::where('user_id', $request->user()->id)->with('room.property')->latest()->paginate(20);
 
-        if ($request->user()->isTenant()) {
+        if ($request->user()->isTenant() || $request->user()->isAdmin()) {
             $this->notifications->markTypesRead($request->user(), ['booking']);
         }
 

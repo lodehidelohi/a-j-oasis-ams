@@ -32,6 +32,8 @@ class PaymentController extends Controller
 
         if ($request->user()->isTenant()) {
             $this->notifications->markTypesRead($request->user(), ['payment', 'utility']);
+        } elseif ($request->user()->isAdmin()) {
+            $this->notifications->markTypesRead($request->user(), ['payment']);
         }
 
         return view('payments.index', compact('payments'));

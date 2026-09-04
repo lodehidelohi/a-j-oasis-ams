@@ -19,6 +19,8 @@ class LeaseController extends Controller
 
         if ($request->user()->isTenant()) {
             $this->notifications->markTypesRead($request->user(), ['lease', 'transfer', 'move_out']);
+        } elseif ($request->user()->isAdmin()) {
+            $this->notifications->markTypesRead($request->user(), ['lease', 'move_out']);
         }
 
         return view('leases.index', compact('leases'));

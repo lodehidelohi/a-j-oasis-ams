@@ -25,7 +25,7 @@ class MaintenanceRequestController extends Controller
             ? $request->user()->leases()->where('status', 'active')->first()
             : null;
 
-        if ($request->user()->isTenant()) {
+        if ($request->user()->isTenant() || $request->user()->isAdmin() || $request->user()->isStaff()) {
             $this->notifications->markTypesRead($request->user(), ['maintenance']);
         }
 

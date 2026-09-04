@@ -26,6 +26,10 @@ class UtilityBillController extends Controller
                 ->latest()
                 ->paginate(25);
 
+        if ($request->user()->isAdmin()) {
+            $this->notifications->markTypesRead($request->user(), ['utility']);
+        }
+
         return view('utility-bills.index', compact('bills'));
     }
 

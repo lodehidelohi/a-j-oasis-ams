@@ -16,12 +16,14 @@ class RoomTransferController extends Controller
 {
     public function __construct(protected NotificationService $notifications) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $transfers = RoomTransfer::with(['lease.tenant', 'fromRoom', 'toRoom'])
             ->orderByRaw("status = 'pending' desc")
             ->latest('requested_at')
             ->paginate(25);
+
+        $this->notifications->markTypesRead($request->user(), ['transfer']);
 
         return view('admin.room-transfers.index', compact('transfers'));
     }
