@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        html { -webkit-text-size-adjust: 100%; font-size: 18px; }
+        html { -webkit-text-size-adjust: 100%; }
         body {
             display: flex;
             flex-direction: column;

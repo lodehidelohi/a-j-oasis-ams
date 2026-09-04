@@ -16,7 +16,7 @@
             --oasis-gold: #c9963e;
             --oasis-sand: #faf6ee;
         }
-        html { -webkit-text-size-adjust: 100%; font-size: 18px; }
+        html { -webkit-text-size-adjust: 100%; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1f2d27; background: #fff; }
         img { max-width: 100%; height: auto; }
         a, button, .btn, .nav-link { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
