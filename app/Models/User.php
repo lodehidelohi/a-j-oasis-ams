@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
+        'photo',
         'is_active',
     ];
 
@@ -50,6 +51,15 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Built from the current request's host (see RoomImage::url()) so it
+     * works regardless of how the app is being served.
+     */
+    public function photoUrl(): ?string
+    {
+        return $this->photo ? asset('storage/'.$this->photo) : null;
     }
 
     public function isAdmin(): bool

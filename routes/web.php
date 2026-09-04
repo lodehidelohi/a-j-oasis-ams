@@ -16,6 +16,7 @@ use App\Http\Controllers\MaintenanceRequestController;
 use App\Http\Controllers\MoveOutController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTransferController;
@@ -48,6 +49,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{notification}/unread', [NotificationController::class, 'markUnread'])->name('notifications.unread');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
     Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
 });
 
 // Admin
