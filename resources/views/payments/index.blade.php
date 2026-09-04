@@ -23,10 +23,16 @@
                         <td><x-status-badge :status="$payment->status" /></td>
                         <td class="text-end">
                             @if (! auth()->user()->isAdmin() && $payment->status === 'pending')
-                                <form method="POST" action="{{ route('payments.pay', $payment) }}">
+                                <form method="POST" action="{{ route('payments.pay', $payment) }}" class="d-inline">
                                     @csrf
                                     <button class="btn btn-sm btn-success"><i class="bi bi-credit-card me-1"></i>Pay via Xendit</button>
                                 </form>
+                                @if ($payment->xendit_invoice_id && ! config('xendit.fake_mode'))
+                                    <form method="POST" action="{{ route('payments.check-status', $payment) }}" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-outline-secondary" title="Already paid on Xendit's checkout page? Check here for local dev, since the webhook can't reach 127.0.0.1."><i class="bi bi-arrow-repeat me-1"></i>Check Status</button>
+                                    </form>
+                                @endif
                             @endif
                         </td>
                     </tr>

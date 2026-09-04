@@ -84,6 +84,39 @@ class PaymentController extends Controller
     }
 
     /**
+     * Manually polls Xendit for this invoice's current status and applies completion
+     * if it's PAID. Xendit's webhook can only reach a publicly-hosted app, so while
+     * developing against a local server this is the only way payment completion can
+     * reach the app — it does the same job the webhook does, just pulled instead of pushed.
+     */
+    public function checkStatus(Payment $payment): RedirectResponse
+    {
+        $tenant = $payment->lease?->tenant ?? $payment->booking?->tenant;
+
+        abort_unless($tenant && $tenant->id === auth()->id(), 403);
+
+        if ($payment->status === 'paid') {
+            return back()->with('status', 'This payment is already marked as paid.');
+        }
+
+        abort_unless($payment->xendit_invoice_id, 422, 'No Xendit invoice has been created for this payment yet.');
+
+        try {
+            $invoice = $this->xendit->getInvoice($payment->xendit_invoice_id);
+        } catch (PaymentGatewayException $e) {
+            return back()->withErrors(['gateway' => $e->getMessage()]);
+        }
+
+        if ($invoice['status'] === 'PAID' || $invoice['status'] === 'SETTLED') {
+            $this->completion->complete($payment, $invoice['invoice_id']);
+
+            return redirect()->route('payments.success');
+        }
+
+        return back()->with('status', 'Not paid yet (status: '.$invoice['status'].'). Complete checkout on Xendit, then check again.');
+    }
+
+    /**
      * TEMPORARY test-run route: only reachable when XENDIT_FAKE_MODE is on.
      * Simulates the webhook's "PAID" callback so the flow can be exercised
      * end-to-end without a working Xendit account.

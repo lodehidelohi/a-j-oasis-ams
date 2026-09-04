@@ -24,4 +24,26 @@ class NotificationController extends Controller
 
         return back();
     }
+
+    public function markAllRead(Request $request): RedirectResponse
+    {
+        $request->user()->notifications()->whereNull('read_at')->update(['read_at' => now()]);
+
+        return back();
+    }
+
+    /**
+     * Marks the notification read, then sends the user to the relevant section
+     * for it (or back to the notifications list if it has no specific destination).
+     */
+    public function open(Request $request, Notification $notification): RedirectResponse
+    {
+        abort_unless($notification->user_id === auth()->id(), 403);
+
+        if (! $notification->isRead()) {
+            $notification->update(['read_at' => now()]);
+        }
+
+        return redirect($notification->linkFor($request->user()) ?? route('notifications.index'));
+    }
 }

@@ -19,7 +19,7 @@
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-primary"><i class="bi bi-send me-1"></i>Submit</button>
-                <a href="{{ route('tenant.leases.show', $lease) }}" class="btn btn-outline-secondary">Cancel</a>
+                <a href="{{ route('tenant.maintenance-requests.index') }}" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>
     </div>

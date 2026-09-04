@@ -15,16 +15,19 @@
                 </div>
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autofocus>
+                    <div class="form-floating mb-3">
+                        <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" placeholder="name@example.com" value="{{ old('email') }}" required autofocus>
+                        <label for="email">Email address</label>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
+                    <div class="form-floating mb-3 position-relative">
+                        <input type="password" name="password" id="password" class="form-control pe-5" placeholder="Password" required>
+                        <label for="password">Password</label>
+                        <button type="button" class="toggle-password btn btn-link position-absolute top-50 end-0 translate-middle-y text-muted p-0 me-3" data-target="password" tabindex="-1">
+                            <i class="bi bi-eye"></i>
+                        </button>
                     </div>
                     <div class="form-check mb-3">
                         <input type="checkbox" name="remember" class="form-check-input" id="remember">
@@ -37,4 +40,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.toggle-password').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const input = document.getElementById(btn.dataset.target);
+            const icon = btn.querySelector('i');
+            const showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            icon.classList.toggle('bi-eye', showing);
+            icon.classList.toggle('bi-eye-slash', !showing);
+        });
+    });
+</script>
 @endsection

@@ -5,6 +5,15 @@
 @section('content')
 <x-page-header title="Notifications" />
 
+@if ($notifications->contains(fn ($notification) => ! $notification->isRead()))
+    <div class="d-flex justify-content-end mb-2">
+        <form method="POST" action="{{ route('notifications.mark-all-read') }}">
+            @csrf
+            <button class="btn btn-sm btn-outline-secondary">Mark all as read</button>
+        </form>
+    </div>
+@endif
+
 <div class="list-group shadow-sm">
     @forelse ($notifications as $notification)
         <div class="list-group-item {{ $notification->isRead() ? '' : 'bg-primary-subtle' }} py-3">
@@ -18,12 +27,17 @@
                 <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
             </div>
             <p class="mb-2 text-muted">{{ $notification->message }}</p>
-            @unless ($notification->isRead())
-                <form method="POST" action="{{ route('notifications.read', $notification) }}">
-                    @csrf
-                    <button class="btn btn-sm btn-outline-secondary">Mark as read</button>
-                </form>
-            @endunless
+            <div class="d-flex gap-2">
+                @if ($notification->linkFor(auth()->user()))
+                    <a href="{{ route('notifications.open', $notification) }}" class="btn btn-sm btn-primary">View</a>
+                @endif
+                @unless ($notification->isRead())
+                    <form method="POST" action="{{ route('notifications.read', $notification) }}">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-secondary">Mark as read</button>
+                    </form>
+                @endunless
+            </div>
         </div>
     @empty
         <div class="list-group-item">

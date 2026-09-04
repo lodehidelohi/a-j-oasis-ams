@@ -41,9 +41,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/payments/success', [PaymentController::class, 'success'])->name('payments.success');
     Route::get('/payments/failure', [PaymentController::class, 'failure'])->name('payments.failure');
     Route::post('/payments/{payment}/pay', [PaymentController::class, 'pay'])->name('payments.pay');
+    Route::post('/payments/{payment}/check-status', [PaymentController::class, 'checkStatus'])->name('payments.check-status');
     Route::get('/payments/fake-complete/{reference}', [PaymentController::class, 'fakeComplete'])->name('payments.fake-complete');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::get('/notifications/{notification}/open', [NotificationController::class, 'open'])->name('notifications.open');
 });
 
 // Admin

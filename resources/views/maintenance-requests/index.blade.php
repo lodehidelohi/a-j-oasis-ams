@@ -5,6 +5,16 @@
 @section('content')
 <x-page-header title="Maintenance Requests" />
 
+@if (auth()->user()->isTenant())
+    <div class="d-flex justify-content-end mb-3">
+        @if ($activeLease)
+            <a href="{{ route('tenant.maintenance-requests.create', $activeLease) }}" class="btn btn-sm btn-primary"><i class="bi bi-tools me-1"></i>Report Maintenance Issue</a>
+        @else
+            <button class="btn btn-sm btn-primary" disabled title="You need an active lease to report an issue."><i class="bi bi-tools me-1"></i>Report Maintenance Issue</button>
+        @endif
+    </div>
+@endif
+
 <div class="card border-0 shadow-sm">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">

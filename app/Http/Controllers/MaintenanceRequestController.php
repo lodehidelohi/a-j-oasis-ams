@@ -21,7 +21,11 @@ class MaintenanceRequestController extends Controller
             default => MaintenanceRequest::where('tenant_id', $request->user()->id)->with('room')->latest()->paginate(25),
         };
 
-        return view('maintenance-requests.index', compact('requests'));
+        $activeLease = $request->user()->isTenant()
+            ? $request->user()->leases()->where('status', 'active')->first()
+            : null;
+
+        return view('maintenance-requests.index', compact('requests', 'activeLease'));
     }
 
     public function create(Lease $lease): View

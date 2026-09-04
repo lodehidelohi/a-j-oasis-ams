@@ -42,25 +42,70 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('rooms.browse') ? 'active' : '' }}" href="{{ route('rooms.browse') }}"><i class="bi bi-search me-1"></i>Browse Rooms</a></li>
                     @auth
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tenant.bookings.*') ? 'active' : '' }}" href="{{ route('tenant.bookings.index') }}"><i class="bi bi-calendar-check me-1"></i>My Bookings</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tenant.leases.*') ? 'active' : '' }}" href="{{ route('tenant.leases.index') }}"><i class="bi bi-file-earmark-text me-1"></i>My Lease</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tenant.payments.*') ? 'active' : '' }}" href="{{ route('tenant.payments.index') }}"><i class="bi bi-credit-card me-1"></i>My Payments</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tenant.maintenance-requests.*') ? 'active' : '' }}" href="{{ route('tenant.maintenance-requests.index') }}"><i class="bi bi-tools me-1"></i>Maintenance</a></li>
-                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tenant.announcements.*') ? 'active' : '' }}" href="{{ route('tenant.announcements.index') }}"><i class="bi bi-megaphone me-1"></i>Announcements</a></li>
+                        @php
+                            $unreadByType = auth()->user()->notifications()->whereNull('read_at')->pluck('type');
+                            $hasUnread = fn (array $types) => $unreadByType->intersect($types)->isNotEmpty();
+                        @endphp
+                        <li class="nav-item"><a class="nav-link position-relative {{ request()->routeIs('tenant.bookings.*') ? 'active' : '' }}" href="{{ route('tenant.bookings.index') }}"><i class="bi bi-calendar-check me-1"></i>My Bookings
+                            @if ($hasUnread(['booking']))<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"><span class="visually-hidden">Unread updates</span></span>@endif
+                        </a></li>
+                        <li class="nav-item"><a class="nav-link position-relative {{ request()->routeIs('tenant.leases.*') ? 'active' : '' }}" href="{{ route('tenant.leases.index') }}"><i class="bi bi-file-earmark-text me-1"></i>My Lease
+                            @if ($hasUnread(['lease', 'transfer', 'move_out']))<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"><span class="visually-hidden">Unread updates</span></span>@endif
+                        </a></li>
+                        <li class="nav-item"><a class="nav-link position-relative {{ request()->routeIs('tenant.payments.*') ? 'active' : '' }}" href="{{ route('tenant.payments.index') }}"><i class="bi bi-credit-card me-1"></i>My Payments
+                            @if ($hasUnread(['payment', 'utility']))<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"><span class="visually-hidden">Unread updates</span></span>@endif
+                        </a></li>
+                        <li class="nav-item"><a class="nav-link position-relative {{ request()->routeIs('tenant.maintenance-requests.*') ? 'active' : '' }}" href="{{ route('tenant.maintenance-requests.index') }}"><i class="bi bi-tools me-1"></i>Maintenance
+                            @if ($hasUnread(['maintenance']))<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"><span class="visually-hidden">Unread updates</span></span>@endif
+                        </a></li>
+                        <li class="nav-item"><a class="nav-link position-relative {{ request()->routeIs('tenant.announcements.*') ? 'active' : '' }}" href="{{ route('tenant.announcements.index') }}"><i class="bi bi-megaphone me-1"></i>Announcements
+                            @if ($hasUnread(['announcement']))<span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"><span class="visually-hidden">Unread updates</span></span>@endif
+                        </a></li>
                     @endauth
                 </ul>
                 <ul class="navbar-nav align-items-lg-center">
                     @auth
-                        <li class="nav-item">
-                            <a class="nav-link position-relative {{ request()->routeIs('notifications.index') ? 'active' : '' }}" href="{{ route('notifications.index') }}">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link position-relative dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-bell fs-6"></i>
-                                @php($unread = auth()->user()->notifications()->whereNull('read_at')->count())
-                                @if ($unread)
+                                @php($unreadCount = $unreadByType->count())
+                                @if ($unreadCount)
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .6rem;">
-                                        {{ $unread > 9 ? '9+' : $unread }}
+                                        {{ $unreadCount > 9 ? '9+' : $unreadCount }}
                                     </span>
                                 @endif
                             </a>
+                            <div class="dropdown-menu dropdown-menu-end shadow-sm p-0" style="width: 340px; max-height: 420px; overflow-y: auto;">
+                                @if ($unreadCount)
+                                    <div class="d-flex justify-content-end px-3 py-2 border-bottom">
+                                        <form method="POST" action="{{ route('notifications.mark-all-read') }}" class="m-0">
+                                            @csrf
+                                            <button class="btn btn-link btn-sm p-0 text-decoration-none">Mark all as read</button>
+                                        </form>
+                                    </div>
+                                @endif
+                                @php($recentNotifications = auth()->user()->notifications()->latest()->take(8)->get())
+                                @forelse ($recentNotifications as $notification)
+                                    <a href="{{ route('notifications.open', $notification) }}" class="dropdown-item d-block py-2 px-3 border-bottom {{ $notification->isRead() ? '' : 'bg-primary-subtle' }}" style="white-space: normal;">
+                                        <div class="d-flex justify-content-between align-items-start gap-2">
+                                            <span class="fw-semibold small mb-0">
+                                                @unless ($notification->isRead())
+                                                    <span class="badge rounded-pill bg-primary me-1" style="width:.4rem;height:.4rem;padding:0;"></span>
+                                                @endunless
+                                                {{ $notification->title }}
+                                            </span>
+                                            <small class="text-muted flex-shrink-0">{{ $notification->created_at->diffForHumans(null, true) }}</small>
+                                        </div>
+                                        <p class="text-muted small mb-0">{{ Str::limit($notification->message, 80) }}</p>
+                                    </a>
+                                @empty
+                                    <div class="p-4 text-center text-muted small">
+                                        <i class="bi bi-bell d-block mb-1 fs-4"></i>
+                                        No notifications yet.
+                                    </div>
+                                @endforelse
+                                <a href="{{ route('notifications.index') }}" class="dropdown-item text-center small py-2 text-primary">View all notifications</a>
+                            </div>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -130,7 +175,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.querySelectorAll('#mainNav .nav-link').forEach(function (link) {
+        document.querySelectorAll('#mainNav .nav-link:not(.dropdown-toggle)').forEach(function (link) {
             link.addEventListener('click', function () {
                 const nav = document.getElementById('mainNav');
                 if (nav.classList.contains('show')) {

@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'api/webhooks/xendit',
         ]);
+
+        // Trust the demo tunnel's (Cloudflare/ngrok) forwarded headers so url()/asset()
+        // generate https:// links even though the app itself is served over plain HTTP.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
