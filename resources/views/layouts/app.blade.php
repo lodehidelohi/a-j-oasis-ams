@@ -29,6 +29,9 @@
         .table td > form:not(:first-child) { margin-left: .35rem; }
         .navbar.sticky-top { padding-top: calc(.5rem + env(safe-area-inset-top)); }
         footer.py-4 { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+
+        /* Smoother, more visible float-up animation for floating labels (Bootstrap's default is a snappy 0.1s) */
+        .form-floating > label { transition: opacity .2s ease, transform .2s ease; }
     </style>
 </head>
 <body class="bg-light">
