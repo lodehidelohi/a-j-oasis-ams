@@ -11,9 +11,20 @@ class NotificationController extends Controller
 {
     public function index(Request $request): View
     {
-        $notifications = $request->user()->notifications()->latest()->paginate(25);
+        $categories = Notification::categories();
+        $category = $request->query('category');
 
-        return view('notifications.index', compact('notifications'));
+        $query = $request->user()->notifications()->latest();
+
+        if ($category && isset($categories[$category])) {
+            $query->whereIn('type', $categories[$category]['types']);
+        } else {
+            $category = null;
+        }
+
+        $notifications = $query->paginate(25)->withQueryString();
+
+        return view('notifications.index', compact('notifications', 'categories', 'category'));
     }
 
     public function markRead(Notification $notification): RedirectResponse

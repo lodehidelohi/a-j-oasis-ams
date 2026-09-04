@@ -5,14 +5,20 @@
 @section('content')
 <x-page-header title="Notifications" />
 
-@if ($notifications->contains(fn ($notification) => ! $notification->isRead()))
-    <div class="d-flex justify-content-end mb-2">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ route('notifications.index') }}" class="btn btn-sm {{ $category === null ? 'btn-primary' : 'btn-outline-secondary' }}">All</a>
+        @foreach ($categories as $key => $meta)
+            <a href="{{ route('notifications.index', ['category' => $key]) }}" class="btn btn-sm {{ $category === $key ? 'btn-primary' : 'btn-outline-secondary' }}">{{ $meta['label'] }}</a>
+        @endforeach
+    </div>
+    @if ($notifications->contains(fn ($notification) => ! $notification->isRead()))
         <form method="POST" action="{{ route('notifications.mark-all-read') }}">
             @csrf
             <button class="btn btn-sm btn-outline-secondary">Mark all as read</button>
         </form>
-    </div>
-@endif
+    @endif
+</div>
 
 <div class="list-group shadow-sm">
     @forelse ($notifications as $notification)
@@ -46,7 +52,7 @@
         </div>
     @empty
         <div class="list-group-item">
-            <x-empty-state icon="bi-bell" message="No notifications yet." />
+            <x-empty-state icon="bi-bell" :message="$category ? 'No '.strtolower($categories[$category]['label']).' notifications yet.' : 'No notifications yet.'" />
         </div>
     @endforelse
 </div>

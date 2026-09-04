@@ -90,4 +90,19 @@ class Notification extends Model
             'announcements' => ['announcement'],
         ];
     }
+
+    /**
+     * Category filter options for the notifications page — same type groupings as
+     * tenantNavSections(), but with a friendly label since this also serves admin/staff.
+     */
+    public static function categories(): array
+    {
+        return [
+            'booking' => ['label' => 'Bookings', 'types' => ['booking']],
+            'lease' => ['label' => 'Lease', 'types' => ['lease', 'transfer', 'move_out']],
+            'payment' => ['label' => 'Payments', 'types' => ['payment', 'utility']],
+            'maintenance' => ['label' => 'Maintenance', 'types' => ['maintenance']],
+            'announcement' => ['label' => 'Announcements', 'types' => ['announcement']],
+        ];
+    }
 }
