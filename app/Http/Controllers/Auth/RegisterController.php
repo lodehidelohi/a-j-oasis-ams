@@ -25,6 +25,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['nullable', 'string', 'max:30'],
+            'photo' => ['nullable', 'image', 'max:2048'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -32,6 +33,7 @@ class RegisterController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
+            'photo' => $request->hasFile('photo') ? $request->file('photo')->store('profiles', 'public') : null,
             'password' => Hash::make($validated['password']),
             'role' => 'tenant',
         ]);

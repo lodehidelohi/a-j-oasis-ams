@@ -4,16 +4,58 @@
 @section('meta_description', 'Create a tenant account at A & J OASIS to book a room online in Koronadal City.')
 
 @section('content')
+
+<style>
+    .avatar-upload { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+    .avatar-preview {
+        position: relative;
+        width: 88px; height: 88px;
+        border-radius: 50%;
+        background: #e4e6ec;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+        color: #8b909a;
+        font-size: 2rem;
+    }
+    .avatar-preview img {
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: none;
+    }
+    .avatar-badge {
+        position: absolute; right: -2px; bottom: -2px;
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        background: var(--bs-primary);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid #fff;
+        cursor: pointer;
+        font-size: .8rem;
+    }
+    .avatar-badge:hover { filter: brightness(0.9); }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-md-5">
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
                 <div class="text-center mb-4">
-                    <i class="bi bi-person-plus-fill text-primary" style="font-size: 2rem;"></i>
-                    <h1 class="h4 mt-2 mb-0">Create a Tenant Account</h1>
+                    <div class="avatar-upload mx-auto">
+                        <div class="avatar-preview">
+                            <img id="avatarImg" alt="Profile photo">
+                            <i class="bi bi-person-fill" id="avatarPlaceholder"></i>
+                        </div>
+                        <label class="avatar-badge" for="avatarInput" title="Add a photo">
+                            <i class="bi bi-camera-fill"></i>
+                        </label>
+                        <input type="file" name="photo" id="avatarInput" accept="image/*" class="d-none">
+                    </div>
+                    <h1 class="h4 mt-3 mb-0">Create a Tenant Account</h1>
                     <p class="text-muted small">Book a room and manage your stay online</p>
                 </div>
-                <form method="POST" action="{{ route('register') }}">
+                <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="form-floating mb-3">
                         <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" placeholder="Full Name" value="{{ old('name') }}" required autofocus>
@@ -52,6 +94,15 @@
 </div>
 
 <script>
+    document.getElementById('avatarInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const img = document.getElementById('avatarImg');
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+        document.getElementById('avatarPlaceholder').style.display = 'none';
+    });
+
     document.querySelectorAll('.toggle-password').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const input = document.getElementById(btn.dataset.target);
