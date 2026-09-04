@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\PaymentGatewayException;
 use App\Models\Lease;
 use App\Models\Payment;
+use App\Services\NotificationService;
 use App\Services\PaymentCompletionService;
 use App\Services\XenditService;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,7 @@ class PaymentController extends Controller
     public function __construct(
         protected XenditService $xendit,
         protected PaymentCompletionService $completion,
+        protected NotificationService $notifications,
     ) {}
 
     public function index(Request $request): View
@@ -27,6 +29,10 @@ class PaymentController extends Controller
                 ->with(['lease', 'booking'])
                 ->latest()
                 ->paginate(25);
+
+        if ($request->user()->isTenant()) {
+            $this->notifications->markTypesRead($request->user(), ['payment', 'utility']);
+        }
 
         return view('payments.index', compact('payments'));
     }

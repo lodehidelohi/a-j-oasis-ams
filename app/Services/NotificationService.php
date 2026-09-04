@@ -30,4 +30,15 @@ class NotificationService
             fn (User $user) => $this->notify($user, $title, $message, $type)
         );
     }
+
+    /**
+     * Marks a user's unread notifications of the given types as read — used
+     * to clear a nav section's unread indicator as soon as the user visits
+     * that section, rather than requiring each notification to be opened
+     * individually first.
+     */
+    public function markTypesRead(User $user, array $types): void
+    {
+        $user->notifications()->whereNull('read_at')->whereIn('type', $types)->update(['read_at' => now()]);
+    }
 }

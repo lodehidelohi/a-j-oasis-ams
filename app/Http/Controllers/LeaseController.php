@@ -3,16 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lease;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class LeaseController extends Controller
 {
+    public function __construct(protected NotificationService $notifications) {}
+
     public function index(Request $request): View
     {
         $leases = $request->user()->isAdmin()
             ? Lease::with(['tenant', 'room.property'])->latest()->paginate(20)
             : Lease::where('tenant_id', $request->user()->id)->with('room.property')->latest()->paginate(20);
+
+        if ($request->user()->isTenant()) {
+            $this->notifications->markTypesRead($request->user(), ['lease', 'transfer', 'move_out']);
+        }
 
         return view('leases.index', compact('leases'));
     }

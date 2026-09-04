@@ -25,6 +25,10 @@ class MaintenanceRequestController extends Controller
             ? $request->user()->leases()->where('status', 'active')->first()
             : null;
 
+        if ($request->user()->isTenant()) {
+            $this->notifications->markTypesRead($request->user(), ['maintenance']);
+        }
+
         return view('maintenance-requests.index', compact('requests', 'activeLease'));
     }
 

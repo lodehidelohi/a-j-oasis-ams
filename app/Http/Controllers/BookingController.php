@@ -6,19 +6,24 @@ use App\Exceptions\PaymentGatewayException;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Services\BookingService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookingController extends Controller
 {
-    public function __construct(protected BookingService $bookings) {}
+    public function __construct(protected BookingService $bookings, protected NotificationService $notifications) {}
 
     public function index(Request $request): View
     {
         $bookings = $request->user()->isAdmin()
             ? Booking::with(['tenant', 'room.property'])->latest()->paginate(20)
             : Booking::where('user_id', $request->user()->id)->with('room.property')->latest()->paginate(20);
+
+        if ($request->user()->isTenant()) {
+            $this->notifications->markTypesRead($request->user(), ['booking']);
+        }
 
         return view('bookings.index', compact('bookings'));
     }
