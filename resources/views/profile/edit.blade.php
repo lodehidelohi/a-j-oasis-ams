@@ -3,7 +3,39 @@
 @section('title', 'My Profile')
 
 @section('content')
-<x-page-header title="My Profile" subtitle="Update your account details, photo, and password." />
+<x-page-header title="My Profile"/>
+
+<style>
+    .avatar-upload { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+    .avatar-preview {
+        position: relative;
+        width: 88px; height: 88px;
+        border-radius: 50%;
+        background: #e4e6ec;
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden;
+        color: #8b909a;
+        font-size: 2rem;
+    }
+    .avatar-preview img {
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: none;
+    }
+    .avatar-badge {
+        position: absolute; right: -2px; bottom: -2px;
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        background: var(--bs-primary);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid #fff;
+        cursor: pointer;
+        font-size: .8rem;
+    }
+    .avatar-badge:hover { filter: brightness(0.9); }
+</style>
 
 <div class="row g-4" style="max-width: 720px;">
     <div class="col-12">
@@ -14,21 +46,24 @@
                     @method('PUT')
 
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        @if ($user->photoUrl())
-                            <img src="{{ $user->photoUrl() }}" alt="{{ $user->name }}" class="rounded-circle" style="width: 72px; height: 72px; object-fit: cover;">
-                        @else
-                            <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center text-secondary fw-semibold" style="width: 72px; height: 72px; font-size: 1.5rem;">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                        <div class="avatar-upload">
+                            <div class="avatar-preview" id="avatarPreview">
+                                <img id="avatarImg" @if ($user->photoUrl()) src="{{ $user->photoUrl() }}" style="display:block;" @endif alt="{{ $user->name }}">
+                                <i class="bi bi-person-fill" id="avatarPlaceholder" style="{{ $user->photoUrl() ? 'display:none;' : '' }}"></i>
                             </div>
-                        @endif
+                            <label class="avatar-badge" for="avatarInput" title="Change photo">
+                                <i class="bi bi-camera-fill"></i>
+                            </label>
+                            <input type="file" name="photo" id="avatarInput" accept="image/*" class="d-none">
+                        </div>
                         <div>
-                            <label class="form-label mb-1 small">Profile Photo</label>
-                            <input type="file" name="photo" accept="image/*" class="form-control form-control-sm @error('photo') is-invalid @enderror">
+                            <div class="fw-semibold">{{ $user->name }}</div>
+                            <div class="text-muted small">Click the camera icon to change your photo.</div>
                             @error('photo')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                             @if ($user->photo)
-                                <button type="submit" form="removePhotoForm" class="btn btn-link btn-sm text-danger p-0 mt-1">Remove photo</button>
+                                <button type="submit" form="removePhotoForm" class="btn btn-link btn-sm text-danger p-0 mt-1 d-block">Remove photo</button>
                             @endif
                         </div>
                     </div>
@@ -85,4 +120,15 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('avatarInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const img = document.getElementById('avatarImg');
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+        document.getElementById('avatarPlaceholder').style.display = 'none';
+    });
+</script>
 @endsection

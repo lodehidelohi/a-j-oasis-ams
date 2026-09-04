@@ -109,7 +109,11 @@
                 </button>
                 <div class="ms-auto dropdown">
                     <a class="d-flex align-items-center gap-2 text-decoration-none text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle fs-5"></i>
+                        @if (auth()->user()->photoUrl())
+                            <img src="{{ auth()->user()->photoUrl() }}" alt="{{ auth()->user()->name }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                        @else
+                            <i class="bi bi-person-circle fs-5"></i>
+                        @endif
                         <span class="d-none d-sm-inline">{{ auth()->user()->name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
