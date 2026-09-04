@@ -22,7 +22,7 @@
                 <tr>
                     @if (! auth()->user()->isTenant())<th>Tenant</th>@endif
                     <th>Room</th><th>Category</th><th>Description</th><th>Photo</th><th>Status</th>
-                    @if (! auth()->user()->isTenant())<th>Assigned To</th><th>Update</th>@endif
+                    @if (! auth()->user()->isTenant())<th>Scheduled</th><th>Update</th>@endif
                 </tr>
             </thead>
             <tbody>
@@ -43,15 +43,22 @@
                         </td>
                         <td><x-status-badge :status="$request->status" /></td>
                         @if (! auth()->user()->isTenant())
-                            <td>{{ $request->assignee?->name ?? '—' }}</td>
+                            <td>{{ $request->scheduled_date?->format('M d, Y') ?? '—' }}</td>
                             <td>
-                                <form method="POST" action="{{ auth()->user()->isAdmin() ? route('admin.maintenance-requests.update', $request) : route('staff.maintenance.update', $request) }}" class="d-flex gap-1">
+                                <form method="POST" action="{{ auth()->user()->isAdmin() ? route('admin.maintenance-requests.update', $request) : route('staff.maintenance.update', $request) }}" class="d-flex flex-wrap gap-1" style="min-width: 340px;">
                                     @csrf @method('PUT')
-                                    <select name="status" class="form-select form-select-sm">
+                                    <select name="status" class="form-select form-select-sm" style="width: auto;">
                                         @foreach (['pending', 'in_progress', 'completed', 'cancelled'] as $status)
                                             <option value="{{ $status }}" @selected($request->status === $status)>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
                                         @endforeach
                                     </select>
+                                    <select name="assigned_to" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="">Unassigned</option>
+                                        @foreach ($assignees as $assignee)
+                                            <option value="{{ $assignee->id }}" @selected($request->assigned_to === $assignee->id)>{{ $assignee->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="date" name="scheduled_date" class="form-control form-control-sm" style="width: auto;" value="{{ $request->scheduled_date?->toDateString() }}">
                                     <button class="btn btn-sm btn-primary">Update</button>
                                 </form>
                             </td>

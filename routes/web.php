@@ -67,6 +67,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
+    Route::get('/tenants/{tenant}', [TenantController::class, 'show'])->name('tenants.show');
     Route::get('/occupancy', [OccupancyController::class, 'index'])->name('occupancy.index');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
@@ -86,6 +87,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/leases', [LeaseController::class, 'index'])->name('leases.index');
     Route::get('/leases/{lease}', [LeaseController::class, 'show'])->name('leases.show');
     Route::post('/leases/{lease}/generate-rent', [PaymentController::class, 'generateRent'])->name('leases.generate-rent');
+    Route::post('/leases/{lease}/document', [LeaseController::class, 'uploadDocument'])->name('leases.document.store');
+    Route::delete('/leases/{lease}/document', [LeaseController::class, 'destroyDocument'])->name('leases.document.destroy');
 
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments/{payment}/record-manual', [PaymentController::class, 'recordManual'])->name('payments.record-manual');

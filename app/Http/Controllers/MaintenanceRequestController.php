@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lease;
 use App\Models\MaintenanceRequest;
+use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,7 +30,11 @@ class MaintenanceRequestController extends Controller
             $this->notifications->markTypesRead($request->user(), ['maintenance']);
         }
 
-        return view('maintenance-requests.index', compact('requests', 'activeLease'));
+        $assignees = $request->user()->isAdmin() || $request->user()->isStaff()
+            ? User::whereIn('role', ['admin', 'staff'])->orderBy('name')->get()
+            : collect();
+
+        return view('maintenance-requests.index', compact('requests', 'activeLease', 'assignees'));
     }
 
     public function create(Lease $lease): View
@@ -75,6 +80,7 @@ class MaintenanceRequestController extends Controller
         $validated = $request->validate([
             'status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
             'assigned_to' => ['nullable', 'exists:users,id'],
+            'scheduled_date' => ['nullable', 'date'],
         ]);
 
         $maintenanceRequest->update([

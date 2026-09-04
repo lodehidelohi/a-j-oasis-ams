@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Lease;
 use App\Services\NotificationService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class LeaseController extends Controller
@@ -33,5 +35,30 @@ class LeaseController extends Controller
         $lease->load(['payments', 'utilityBills', 'maintenanceRequests', 'roomTransfers', 'moveOut', 'room.property', 'tenant']);
 
         return view('leases.show', compact('lease'));
+    }
+
+    public function uploadDocument(Request $request, Lease $lease): RedirectResponse
+    {
+        $request->validate([
+            'document' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
+        ]);
+
+        if ($lease->document) {
+            Storage::disk('public')->delete($lease->document);
+        }
+
+        $lease->update(['document' => $request->file('document')->store('lease-documents', 'public')]);
+
+        return back()->with('status', 'Lease agreement uploaded.');
+    }
+
+    public function destroyDocument(Lease $lease): RedirectResponse
+    {
+        if ($lease->document) {
+            Storage::disk('public')->delete($lease->document);
+            $lease->update(['document' => null]);
+        }
+
+        return back()->with('status', 'Lease agreement removed.');
     }
 }

@@ -30,13 +30,25 @@ class PaymentController extends Controller
                 ->latest()
                 ->paginate(25);
 
+        $outstandingBalance = null;
+        $nextDueDate = null;
+
         if ($request->user()->isTenant()) {
+            $pending = Payment::where('status', 'pending')->where(
+                fn ($q) => $q->whereHas('lease', fn ($q2) => $q2->where('tenant_id', $request->user()->id))
+                    ->orWhereHas('booking', fn ($q2) => $q2->where('user_id', $request->user()->id))
+            );
+
+            $outstandingBalance = (clone $pending)->sum('amount');
+            $nextDueDateRaw = (clone $pending)->orderBy('due_date')->value('due_date');
+            $nextDueDate = $nextDueDateRaw ? \Carbon\Carbon::parse($nextDueDateRaw) : null;
+
             $this->notifications->markTypesRead($request->user(), ['payment', 'utility']);
         } elseif ($request->user()->isAdmin()) {
             $this->notifications->markTypesRead($request->user(), ['payment']);
         }
 
-        return view('payments.index', compact('payments'));
+        return view('payments.index', compact('payments', 'outstandingBalance', 'nextDueDate'));
     }
 
     /**

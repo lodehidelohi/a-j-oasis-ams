@@ -19,6 +19,7 @@ class Lease extends Model
         'start_date',
         'end_date',
         'status',
+        'document',
     ];
 
     protected function casts(): array
@@ -67,5 +68,14 @@ class Lease extends Model
     public function moveOut(): HasOne
     {
         return $this->hasOne(MoveOut::class);
+    }
+
+    /**
+     * Built from the current request's host (see RoomImage::url()) so it
+     * works regardless of how the app is being served.
+     */
+    public function documentUrl(): ?string
+    {
+        return $this->document ? asset('storage/'.$this->document) : null;
     }
 }

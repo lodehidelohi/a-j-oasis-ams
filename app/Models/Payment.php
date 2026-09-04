@@ -50,6 +50,7 @@ class Payment extends Model
     public function isWithinGracePeriod(): bool
     {
         return $this->status === 'pending'
+            && now()->gte($this->due_date)
             && now()->lt($this->due_date->copy()->addDays(30));
     }
 

@@ -5,6 +5,21 @@
 @section('content')
 <x-page-header :title="auth()->user()->isAdmin() ? 'All Payments' : 'My Payments'" />
 
+@if (! auth()->user()->isAdmin())
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4 d-flex flex-wrap gap-4">
+            <div>
+                <p class="text-muted small text-uppercase mb-1">Outstanding Balance</p>
+                <p class="h3 mb-0 {{ $outstandingBalance > 0 ? 'text-danger' : 'text-success' }}">₱{{ number_format($outstandingBalance, 2) }}</p>
+            </div>
+            <div>
+                <p class="text-muted small text-uppercase mb-1">Next Due Date</p>
+                <p class="h3 mb-0">{{ $nextDueDate?->format('M d, Y') ?? '—' }}</p>
+            </div>
+        </div>
+    </div>
+@endif
+
 <div class="card border-0 shadow-sm">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">

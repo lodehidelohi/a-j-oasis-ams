@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AnnouncementMail;
 use App\Models\Announcement;
 use App\Models\Property;
 use App\Models\User;
@@ -10,6 +11,7 @@ use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -52,9 +54,10 @@ class AnnouncementController extends Controller
             'tenant_id' => $validated['audience'] === 'tenant' ? $validated['tenant_id'] : null,
         ]);
 
-        $this->targetedTenants($announcement)->each(
-            fn (User $tenant) => $this->notifications->notify($tenant, $announcement->title, $announcement->body, 'announcement')
-        );
+        $this->targetedTenants($announcement)->each(function (User $tenant) use ($announcement) {
+            $this->notifications->notify($tenant, $announcement->title, $announcement->body, 'announcement');
+            Mail::to($tenant->email)->send(new AnnouncementMail($announcement, $tenant));
+        });
 
         return redirect()->route('admin.announcements.index')->with('status', 'Announcement posted.');
     }

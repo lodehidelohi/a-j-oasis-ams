@@ -19,12 +19,14 @@ class MaintenanceRequest extends Model
         'photo',
         'status',
         'assigned_to',
+        'scheduled_date',
         'resolved_at',
     ];
 
     protected function casts(): array
     {
         return [
+            'scheduled_date' => 'date',
             'resolved_at' => 'datetime',
         ];
     }
