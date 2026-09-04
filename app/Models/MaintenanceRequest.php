@@ -16,6 +16,7 @@ class MaintenanceRequest extends Model
         'room_id',
         'category',
         'description',
+        'photo',
         'status',
         'assigned_to',
         'resolved_at',
@@ -46,5 +47,14 @@ class MaintenanceRequest extends Model
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /**
+     * Built from the current request's host (see RoomImage::url()) so it
+     * works regardless of how the app is being served.
+     */
+    public function photoUrl(): ?string
+    {
+        return $this->photo ? asset('storage/'.$this->photo) : null;
     }
 }

@@ -114,17 +114,26 @@
         <div class="table-responsive">
             <table class="table align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>Category</th><th>Description</th><th>Status</th></tr>
+                    <tr><th>Category</th><th>Description</th><th>Photo</th><th>Status</th></tr>
                 </thead>
                 <tbody>
                     @forelse ($lease->maintenanceRequests as $request)
                         <tr>
                             <td>{{ $request->category }}</td>
                             <td>{{ $request->description }}</td>
+                            <td>
+                                @if ($request->photoUrl())
+                                    <a href="{{ $request->photoUrl() }}" target="_blank">
+                                        <img src="{{ $request->photoUrl() }}" alt="Issue photo" class="rounded" style="width: 44px; height: 44px; object-fit: cover;">
+                                    </a>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                             <td><x-status-badge :status="$request->status" /></td>
                         </tr>
                     @empty
-                        <tr><td colspan="3"><x-empty-state icon="bi-tools" message="No maintenance requests yet." /></td></tr>
+                        <tr><td colspan="4"><x-empty-state icon="bi-tools" message="No maintenance requests yet." /></td></tr>
                     @endforelse
                 </tbody>
             </table>

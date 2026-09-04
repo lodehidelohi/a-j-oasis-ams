@@ -21,7 +21,7 @@
             <thead class="table-light">
                 <tr>
                     @if (! auth()->user()->isTenant())<th>Tenant</th>@endif
-                    <th>Room</th><th>Category</th><th>Description</th><th>Status</th>
+                    <th>Room</th><th>Category</th><th>Description</th><th>Photo</th><th>Status</th>
                     @if (! auth()->user()->isTenant())<th>Assigned To</th><th>Update</th>@endif
                 </tr>
             </thead>
@@ -32,6 +32,15 @@
                         <td>{{ $request->room->room_number }}</td>
                         <td>{{ $request->category }}</td>
                         <td>{{ $request->description }}</td>
+                        <td>
+                            @if ($request->photoUrl())
+                                <a href="{{ $request->photoUrl() }}" target="_blank">
+                                    <img src="{{ $request->photoUrl() }}" alt="Issue photo" class="rounded" style="width: 44px; height: 44px; object-fit: cover;">
+                                </a>
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
+                        </td>
                         <td><x-status-badge :status="$request->status" /></td>
                         @if (! auth()->user()->isTenant())
                             <td>{{ $request->assignee?->name ?? '—' }}</td>
@@ -49,7 +58,7 @@
                         @endif
                     </tr>
                 @empty
-                    <tr><td colspan="6"><x-empty-state icon="bi-tools" message="No maintenance requests yet." /></td></tr>
+                    <tr><td colspan="{{ auth()->user()->isTenant() ? 5 : 7 }}"><x-empty-state icon="bi-tools" message="No maintenance requests yet." /></td></tr>
                 @endforelse
             </tbody>
         </table>

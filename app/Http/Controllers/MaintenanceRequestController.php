@@ -46,6 +46,7 @@ class MaintenanceRequestController extends Controller
         $validated = $request->validate([
             'category' => ['required', 'string', 'max:100'],
             'description' => ['required', 'string', 'max:2000'],
+            'photo' => ['nullable', 'image', 'max:5120'],
         ]);
 
         MaintenanceRequest::create([
@@ -54,6 +55,7 @@ class MaintenanceRequestController extends Controller
             'room_id' => $lease->room_id,
             'category' => $validated['category'],
             'description' => $validated['description'],
+            'photo' => $request->hasFile('photo') ? $request->file('photo')->store('maintenance', 'public') : null,
             'status' => 'pending',
         ]);
 
