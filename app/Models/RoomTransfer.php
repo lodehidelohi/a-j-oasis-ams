@@ -14,6 +14,7 @@ class RoomTransfer extends Model
         'lease_id',
         'from_room_id',
         'to_room_id',
+        'reason',
         'deposit_adjustment',
         'status',
         'requested_at',
